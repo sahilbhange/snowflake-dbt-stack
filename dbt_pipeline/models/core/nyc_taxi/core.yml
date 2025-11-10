@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: dim_vendor
+    description: Vendor dimension providing descriptive names for taxi providers.
+    columns:
+      - name: vendor_sk
+        tests:
+          - not_null
+          - unique
+      - name: vendor_id
+        tests:
+          - not_null
+
+  - name: dim_payment_type
+    description: Payment method dimension with descriptive labels.
+    columns:
+      - name: payment_type_sk
+        tests:
+          - not_null
+          - unique
+      - name: payment_type_code
+        tests:
+          - not_null
+
+  - name: dim_rate_code
+    description: Rate code dimension describing NYC TLC pricing categories.
+    columns:
+      - name: rate_code_sk
+        tests:
+          - not_null
+          - unique
+      - name: rate_code_id
+        tests:
+          - not_null
+
+  - name: dim_taxi_zone
+    description: Taxi Zone dimension bridging location IDs to borough and zone names.
+    columns:
+      - name: taxi_zone_sk
+        tests:
+          - not_null
+          - unique
+      - name: location_id
+        tests:
+          - not_null
+
+  - name: fact_nyc_taxi_trips
+    description: Atomic trip-level fact table spanning yellow, green, and high-volume vehicles.
+    columns:
+      - name: trip_sk
+        tests:
+          - not_null
+          - unique
+      - name: pickup_timestamp
+        tests:
+          - not_null
+      - name: vendor_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_vendor')
+                field: vendor_sk
+        meta:
+          dimension: vendor
+      - name: payment_type_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_payment_type')
+                field: payment_type_sk
+      - name: rate_code_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_rate_code')
+                field: rate_code_sk
+      - name: pickup_zone_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_taxi_zone')
+                field: taxi_zone_sk
+      - name: dropoff_zone_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_taxi_zone')
+                field: taxi_zone_sk

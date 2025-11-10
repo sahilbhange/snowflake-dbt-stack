@@ -1,0 +1,43 @@
+version: 2
+
+sources:
+  - name: nyc_taxi
+    database: ANALYTICS
+    schema: RAW
+    tables:
+      - name: raw_tran_nyc_taxi_yellow
+        identifier: raw_tran_nyc_taxi_yellow
+        description: Raw yellow taxi trip parquet ingested via dbt run-operation.
+        loaded_at_field: pickup_datetime
+        freshness:
+          warn_after: {count: 36, period: hour}
+          error_after: {count: 72, period: hour}
+        columns:
+          - name: vendorid
+            tests:
+              - not_null
+          - name: tpep_pickup_datetime
+          - name: tpep_dropoff_datetime
+      - name: raw_tran_nyc_taxi_green
+        identifier: raw_tran_nyc_taxi_green
+        description: Raw green taxi trip parquet ingested via dbt run-operation.
+        loaded_at_field: lpep_pickup_datetime
+        freshness:
+          warn_after: {count: 36, period: hour}
+          error_after: {count: 72, period: hour}
+        columns:
+          - name: vendorid
+            tests:
+              - not_null
+          - name: lpep_pickup_datetime
+          - name: lpep_dropoff_datetime
+      - name: raw_tran_nyc_taxi_fhvhv
+        identifier: raw_tran_nyc_taxi_fhvhv
+        description: For-hire vehicle high-volume trip parquet ingested via dbt run-operation.
+        loaded_at_field: pickup_datetime
+        freshness:
+          warn_after: {count: 36, period: hour}
+          error_after: {count: 72, period: hour}
+        columns:
+          - name: hvfhs_license_num
+          - name: dispatching_base_num

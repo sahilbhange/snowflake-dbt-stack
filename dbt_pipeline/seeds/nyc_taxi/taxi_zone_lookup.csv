@@ -1,0 +1,27 @@
+location_id,borough,zone,service_zone
+1,Manhattan,Financial District North,Yellow Zone
+2,Manhattan,Financial District South,Yellow Zone
+3,Manhattan,Greenwich Village South,Yellow Zone
+4,Manhattan,Greenwich Village North,Yellow Zone
+5,Manhattan,Midtown South,Yellow Zone
+7,Brooklyn,Brooklyn Heights,Yellow Zone
+10,Queens,Astoria,Yellow Zone
+12,Queens,Jackson Heights,Yellow Zone
+13,Queens,LaGuardia Airport,Airport
+14,Queens,JFK Airport,Airport
+24,Bronx,Allerton/Pelham Gardens,Green Zone
+33,Manhattan,Chinatown,Yellow Zone
+43,Manhattan,East Harlem North,Yellow Zone
+48,Manhattan,East Village,Yellow Zone
+50,Manhattan,Flatiron,Yellow Zone
+68,Brooklyn,Bushwick North,Green Zone
+79,Queens,Long Island City/Hunters Point,Yellow Zone
+87,Staten Island,St. George/New Brighton,Green Zone
+132,Manhattan,Times Sq/Theatre District,Yellow Zone
+138,Manhattan,Upper East Side North,Yellow Zone
+140,Manhattan,Upper West Side South,Yellow Zone
+142,Manhattan,Washington Heights North,Green Zone
+148,Brooklyn,Park Slope,Green Zone
+161,Queens,Far Rockaway,Green Zone
+170,Bronx,Melrose South,Green Zone
+211,Brooklyn,Sunset Park West,Green Zone

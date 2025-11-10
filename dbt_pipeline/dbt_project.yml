@@ -2,6 +2,8 @@ name: dbt_pipeline
 version: 1.0.0
 config-version: 2
 profile: dbt_pipeline
+vars:
+  surrogate_key_treat_nulls_as_empty_strings: true
 model-paths:
   - models
 analysis-paths:

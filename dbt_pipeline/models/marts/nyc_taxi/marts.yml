@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: mart_trips_daily
+    description: Daily KPI rollups for NYC taxi services by mode.
+    columns:
+      - name: pickup_date
+        tests:
+          - not_null
+      - name: trip_count
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+  - name: mart_zone_flow
+    description: Origin-destination matrix summarizing trip flows and revenue.
+    columns:
+      - name: trip_count
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0

@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: stg_tran_nyc_taxi_yellow
+    description: Cleaned yellow cab trip transactions with canonical data types and derived fields.
+    columns:
+      - name: trip_sk
+        tests:
+          - not_null
+          - unique
+      - name: pickup_timestamp
+        tests:
+          - not_null
+      - name: dropoff_timestamp
+      - name: pickup_location_id
+      - name: dropoff_location_id
+
+  - name: stg_tran_nyc_taxi_green
+    description: Cleaned green cab trip transactions with canonical data types and derived fields.
+    columns:
+      - name: trip_sk
+        tests:
+          - not_null
+          - unique
+      - name: pickup_timestamp
+        tests:
+          - not_null
+
+  - name: stg_tran_nyc_taxi_fhvhv
+    description: Cleaned high-volume for-hire vehicle trips aligned to taxi canonical schema.
+    columns:
+      - name: trip_sk
+        tests:
+          - not_null
+          - unique
+      - name: pickup_timestamp
