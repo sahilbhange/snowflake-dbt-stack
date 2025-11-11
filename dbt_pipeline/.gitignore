@@ -3,3 +3,10 @@ target/
 dbt_modules/
 logs/
 dbt_internal_packages/
+
+
+# dbt build artifacts
+dbt_packages/
+target/
+logs/
+dbt_modules/

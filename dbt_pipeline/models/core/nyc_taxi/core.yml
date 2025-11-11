@@ -58,32 +58,27 @@ models:
       - name: vendor_sk
         tests:
           - relationships:
-              arguments:
-                to: ref('dim_vendor')
-                field: vendor_sk
+              to: ref('dim_vendor')
+              field: vendor_sk
         meta:
           dimension: vendor
       - name: payment_type_sk
         tests:
           - relationships:
-              arguments:
-                to: ref('dim_payment_type')
-                field: payment_type_sk
+              to: ref('dim_payment_type')
+              field: payment_type_sk
       - name: rate_code_sk
         tests:
           - relationships:
-              arguments:
-                to: ref('dim_rate_code')
-                field: rate_code_sk
+              to: ref('dim_rate_code')
+              field: rate_code_sk
       - name: pickup_zone_sk
         tests:
           - relationships:
-              arguments:
-                to: ref('dim_taxi_zone')
-                field: taxi_zone_sk
+              to: ref('dim_taxi_zone')
+              field: taxi_zone_sk
       - name: dropoff_zone_sk
         tests:
           - relationships:
-              arguments:
-                to: ref('dim_taxi_zone')
-                field: taxi_zone_sk
+              to: ref('dim_taxi_zone')
+              field: taxi_zone_sk

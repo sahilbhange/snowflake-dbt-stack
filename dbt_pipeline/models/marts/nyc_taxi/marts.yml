@@ -11,8 +11,8 @@ models:
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              arguments:
-                min_value: 0
+              min_value: 0
+
   - name: mart_zone_flow
     description: Origin-destination matrix summarizing trip flows and revenue.
     columns:
@@ -20,5 +20,4 @@ models:
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              arguments:
-                min_value: 0
+              min_value: 0
