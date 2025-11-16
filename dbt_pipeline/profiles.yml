@@ -23,3 +23,20 @@ dbt_pipeline:
       schema: "{{ env_var('SNOWFLAKE_PROD_SCHEMA', 'RAW') }}"
       authenticator: SNOWFLAKE_JWT
       private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.ssh/snowflake_keys/dbt_svc_rsa_key.p8') }}"
+
+
+## Do not delete workspace settings
+# # Workspace settings
+# dbt_pipeline:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: snowflake
+#       # account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'JNAEVTS-ZZC51360') }}"
+#       user: sahilbhange # "{{ env_var('SNOWFLAKE_USER', 'DBT_SVC') }}"
+#       role: DBT_ETL # "{{ env_var('SNOWFLAKE_ROLE', 'DBT_ETL') }}"
+#       warehouse: DBT_WH_M # "{{ env_var('SNOWFLAKE_WAREHOUSE', 'DBT_WH_M') }}"
+#       database: ANALYTICS # "{{ env_var('SNOWFLAKE_DATABASE', 'ANALYTICS') }}"
+#       schema: RAW # "{{ env_var('SNOWFLAKE_SCHEMA', 'RAW') }}"
+#       # authenticator: SNOWFLAKE_JWT
+#       # private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '~/.ssh/snowflake_keys/dbt_svc_rsa_key.p8') }}"
