@@ -4,11 +4,11 @@ This guide walks you through prerequisites, local setup, deployment, and day‑t
 
 ## 1. Prerequisites
 
-- Snowflake account with a role that can create warehouses/schemas (already covered by `scripts/initial_setup.sql`).
+- Snowflake account with a role that can create warehouses/schemas (already covered by `snowflake_scripts/step_01_initial_setup.sql`).
 - Python 3.10+ with `pip`.
 - SnowSQL CLI (for PUT commands) – optional if you already uploaded files.
 - SSH key pair for Snowflake key auth (`~/.ssh/snowflake_keys/dbt_svc_rsa_key.p8`).
-- Access to public NYC TLC parquet files (download instructions in `scripts/local_ingest_workflow.sql`).
+- Access to public NYC TLC parquet files (upload instructions in `snowflake_scripts/step_03_raw_stage_upload.sql`).
 
 ## 2. Environment Bootstrap
 
@@ -38,7 +38,7 @@ dbt --project-dir dbt_pipeline deps
 
 ## 3. Raw Data Ingestion
 
-1. Download TLC parquet files under `data/nyc_tlc/{yellow,green,fhvhv}` (see commands in `scripts/local_ingest_workflow.sql`).
+1. Download TLC parquet files under `data/nyc_tlc/{yellow,green,fhvhv}` (see commands in `snowflake_scripts/step_03_raw_stage_upload.sql`).
 2. Upload them to Snowflake using SnowSQL PUT commands:
    ```sql
    PUT 'file:///Users/<user>/snowflake-dbt-stack/data/nyc_tlc/yellow/*.parquet'
@@ -80,7 +80,7 @@ You can also run `dbt docs generate && dbt docs serve` and open the Graph tab fo
 - `dbt_pipeline/models/core/` – dimensions + incremental fact.
 - `dbt_pipeline/models/marts/` – reporting tables.
 - `dbt_pipeline/macros/nyc_tlc_ingestion.sql` – local stage ingest macro.
-- `scripts/*.sql` – Snowflake role/warehouse setup & manual ingest instructions.
+- `snowflake_scripts/*.sql` – Snowflake role/warehouse setup & manual ingest instructions.
 - `docs/` – DAG + project overview.
 
 ## 7. Snowflake Native Execution

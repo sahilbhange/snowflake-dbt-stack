@@ -1,0 +1,116 @@
+USE ROLE SECURITYADMIN;
+
+-- 1) Create a dedicated role for dbt
+CREATE ROLE IF NOT EXISTS DBT_ETL 
+COMMENT = 'Service role for dbt builds (create/read/write in analytics)';
+
+-- 2) Let you (or an admin group) manage this role
+GRANT ROLE DBT_ETL TO ROLE SYSADMIN;  -- allows SYSADMIN to administer objects owned by DBT_ETL
+
+
+USE ROLE ACCOUNTADMIN;
+
+
+-- 3) Allow DBT_ETL to execute tasks (if you plan to use Snowflake Tasks)
+GRANT EXECUTE TASK ON ACCOUNT TO ROLE DBT_ETL;
+
+USE ROLE SYSADMIN;
+
+-- 4) Warehouses (Medium & Large), autosuspend/scale-out friendly
+CREATE WAREHOUSE IF NOT EXISTS DBT_WH_M
+  WAREHOUSE_SIZE = 'MEDIUM'
+  AUTO_SUSPEND = 30
+  AUTO_RESUME = TRUE
+  MAX_CLUSTER_COUNT = 2
+  MIN_CLUSTER_COUNT = 1
+  SCALING_POLICY = 'STANDARD'
+  COMMENT = 'dbt primary warehouse (MEDIUM)';
+
+CREATE WAREHOUSE IF NOT EXISTS DBT_WH_L
+  WAREHOUSE_SIZE = 'LARGE'
+  AUTO_SUSPEND = 120
+  AUTO_RESUME = TRUE
+  MAX_CLUSTER_COUNT = 3
+  MIN_CLUSTER_COUNT = 1
+  SCALING_POLICY = 'STANDARD'
+  COMMENT = 'dbt heavy runs (LARGE)';
+
+
+-- 5) Analytics database + standard schemas
+CREATE DATABASE IF NOT EXISTS ANALYTICS COMMENT = 'Primary analytics database for dbt models';
+CREATE SCHEMA   IF NOT EXISTS ANALYTICS.RAW    COMMENT = 'Landing/ingest layer';
+CREATE SCHEMA   IF NOT EXISTS ANALYTICS.STAGE  COMMENT = 'Staging/cleanup layer';
+CREATE SCHEMA   IF NOT EXISTS ANALYTICS.CORE   COMMENT = 'Modeled, conformed layer';
+CREATE SCHEMA   IF NOT EXISTS ANALYTICS.MART   COMMENT = 'Presentation marts for BI';
+CREATE SCHEMA   IF NOT EXISTS ANALYTICS.UTIL   COMMENT = 'Utilities (seeds, macros artifacts, UDFs, etc.)';
+
+
+USE ROLE SECURITYADMIN;
+
+-- 7) Service user for dbt (use key-pair auth for CI/CD if possible)
+CREATE USER IF NOT EXISTS DBT_SVC
+  LOGIN_NAME = DBT_SVC
+  DISPLAY_NAME = 'DBT Service User'
+  EMAIL = 'sahilbhange@gmail.com'
+  DEFAULT_ROLE = DBT_ETL
+  DEFAULT_WAREHOUSE = DBT_WH_M
+  MUST_CHANGE_PASSWORD = FALSE
+  COMMENT = 'Service user used by dbt';
+
+-- Optional: key-pair auth (paste your RSA public key, one line, no headers)
+-- ALTER USER DBT_SVC SET RSA_PUBLIC_KEY='<SSH_PUBLIC_KEY>';
+
+-- 8) Grant the dbt role to the service user
+GRANT ROLE DBT_ETL TO USER DBT_SVC;
+
+
+USE ROLE SECURITYADMIN;
+
+-- Warehouse usage/monitor for dbt role
+GRANT USAGE, MONITOR ON WAREHOUSE DBT_WH_M TO ROLE DBT_ETL;
+GRANT USAGE, MONITOR ON WAREHOUSE DBT_WH_L TO ROLE DBT_ETL;
+
+-- Database-level grants
+GRANT USAGE ON DATABASE ANALYTICS TO ROLE DBT_ETL;
+GRANT CREATE SCHEMA ON DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+-- Schema-level (ALL current schemas)
+GRANT USAGE ON ALL SCHEMAS IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+-- Ensure dbt can create objects inside each schema (current)
+GRANT CREATE TABLE, CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT,
+      CREATE SEQUENCE, CREATE TEMPORARY TABLE, CREATE TASK, CREATE STREAM
+ON ALL SCHEMAS IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+-- FUTURE grants so new schemas/objects are automatically permitted
+GRANT USAGE
+ON FUTURE SCHEMAS IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES
+ON FUTURE TABLES IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+GRANT USAGE
+ON FUTURE SEQUENCES IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+GRANT USAGE
+ON FUTURE STAGES IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+GRANT USAGE
+ON FUTURE FILE FORMATS IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+-- Views (dbt creates a lot of them)
+GRANT SELECT ON FUTURE VIEWS IN DATABASE ANALYTICS TO ROLE DBT_ETL;
+
+-- If you plan to use tasks/streams broadly with dbt-created objects,
+-- you may give operate/monitor as needed at object-level after creation.
+
+
+
+GRANT EXECUTE TASK ON ACCOUNT TO ROLE DBT_ETL;
+
+-- SECURITYADMIN
+ALTER USER DBT_SVC SET
+  DEFAULT_ROLE = DBT_ETL
+  DEFAULT_WAREHOUSE = DBT_WH_M
+  QUERY_TAG = 'dbt'
+  STATEMENT_TIMEOUT_IN_SECONDS = 3600;  -- adjust as you like
