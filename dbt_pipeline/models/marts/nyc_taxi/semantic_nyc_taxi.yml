@@ -1,0 +1,51 @@
+version: 2
+
+semantic_models:
+  - name: nyc_taxi_trips_daily
+    description: "Semantic model for NYC taxi daily metrics."
+    model: ref('mart_trips_daily')
+
+    defaults:
+      agg_time_dimension: pickup_date
+
+    entities:
+      - name: nyc_taxi_trips_daily_key
+        type: primary
+        expr: "concat(to_char(pickup_date), '-', service_type)"
+
+    measures:
+      - name: trip_count
+        agg: sum
+        expr: trip_count
+        description: "Total trips for the given grain."
+
+      - name: gross_revenue
+        agg: sum
+        expr: gross_revenue
+        description: "Total gross revenue for the given grain."
+
+    dimensions:
+      - name: pickup_date
+        type: time
+        type_params:
+          time_granularity: day
+
+      - name: service_type
+        type: categorical
+
+metrics:
+  - name: total_trips
+    label: "Total Trips"
+    description: "Total number of trips."
+    type: simple
+    type_params:
+      measure:
+        name: trip_count
+
+  - name: total_gross_revenue
+    label: "Total Gross Revenue"
+    description: "Total gross revenue from taxi trips."
+    type: simple
+    type_params:
+      measure:
+        name: gross_revenue
