@@ -1,0 +1,17 @@
+[sqlfluff]
+dialect = snowflake
+templater = dbt
+max_line_length = 120
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = .
+profile = dbt_pipeline
+target = dev
+
+[sqlfluff:rules]
+# Start with a slightly relaxed rule set to match
+# the existing project style. You can tighten this
+# over time by removing rules from exclude_rules.
+exclude_rules = L009,L010,L014
+

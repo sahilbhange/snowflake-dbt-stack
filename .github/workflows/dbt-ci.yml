@@ -1,28 +1,22 @@
-name: dbt CI
+name: dbt Validation Only
 
 on:
   pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
+    branches:
+      - "dev"
+      - "main"
 
 jobs:
-  dev_build:
-    name: Dev build (PRs)
-    if: github.event_name == 'pull_request'
+  validate_dev:
+    name: Validate dbt project (dev PRs, no Snowflake compute)
+    if: github.base_ref == 'dev'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-      SNOWFLAKE_DEV_DATABASE: ${{ secrets.SNOWFLAKE_DEV_DATABASE }}
-      SNOWFLAKE_DEV_SCHEMA: ${{ secrets.SNOWFLAKE_DEV_SCHEMA }}
-      SNOWFLAKE_DEV_ROLE: ${{ secrets.SNOWFLAKE_DEV_ROLE }}
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,46 +24,50 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dbt-snowflake
-        run: pip install dbt-snowflake
-
-      - name: Write Snowflake private key
+      - name: Install dbt + linting dependencies
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_B64 }}" | base64 -d > ~/.ssh/dbt_key.p8
-          chmod 600 ~/.ssh/dbt_key.p8
-          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$HOME/.ssh/dbt_key.p8" >> $GITHUB_ENV
+          pip install \
+            dbt-core \
+            dbt-snowflake \
+            sqlfluff \
+            sqlfluff-templater-dbt
 
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt build (dev, targeted)
-        run: dbt build --target dev --select path:models/staging path:models/intermediate path:models/core path:models/marts
+      - name: dbt compile (syntax check, dev target)
+        run: dbt compile --target dev
 
-      - name: Upload dbt artifacts (dev)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dbt_artifacts_dev
-          path: dbt_pipeline/target
+      - name: Validate docs & tests coverage
+        run: python scripts/validate_dbt_metadata.py
 
-  prod_build:
-    name: Prod build (main branch)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: SQLFluff lint (Snowflake dialect)
+        run: |
+          sqlfluff lint models/ \
+            --dialect snowflake \
+            --templater dbt \
+            --format github
+
+      - name: SQLFluff fix (dry run, no changes)
+        run: |
+          sqlfluff fix models/ \
+            --dialect snowflake \
+            --templater dbt \
+            --force \
+            --nofix
+
+  validate_prod:
+    name: Validate dbt project (prod PRs, no Snowflake compute)
+    if: github.base_ref == 'main'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-      SNOWFLAKE_PROD_DATABASE: ${{ secrets.SNOWFLAKE_PROD_DATABASE }}
-      SNOWFLAKE_PROD_SCHEMA: ${{ secrets.SNOWFLAKE_PROD_SCHEMA }}
-      SNOWFLAKE_PROD_ROLE: ${{ secrets.SNOWFLAKE_PROD_ROLE }}
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,33 +75,36 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dbt-snowflake
-        run: pip install dbt-snowflake
-
-      - name: Write Snowflake private key
+      - name: Install dbt + linting dependencies
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_B64 }}" | base64 -d > ~/.ssh/dbt_key.p8
-          chmod 600 ~/.ssh/dbt_key.p8
-          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$HOME/.ssh/dbt_key.p8" >> $GITHUB_ENV
+          pip install \
+            dbt-core \
+            dbt-snowflake \
+            sqlfluff \
+            sqlfluff-templater-dbt
 
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt seed (nyc_taxi)
-        run: dbt seed --select nyc_taxi --target prod
+      - name: dbt compile (syntax check, prod target)
+        run: dbt compile --target prod
 
-      - name: dbt run (full DAG, prod)
-        run: dbt build --target prod
+      - name: Validate docs & tests coverage
+        run: python scripts/validate_dbt_metadata.py
 
-      - name: dbt docs generate
-        run: dbt docs generate --target prod
+      - name: SQLFluff lint (Snowflake dialect)
+        run: |
+          sqlfluff lint models/ \
+            --dialect snowflake \
+            --templater dbt \
+            --format github
 
-      - name: Upload dbt artifacts (prod)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dbt_artifacts_prod
-          path: dbt_pipeline/target
-
+      - name: SQLFluff fix (dry run, no changes)
+        run: |
+          sqlfluff fix models/ \
+            --dialect snowflake \
+            --templater dbt \
+            --force \
+            --nofix
