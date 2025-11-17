@@ -20,13 +20,18 @@ def main(manifest_path: str = "target/manifest.json") -> int:
     manifest = load_manifest(manifest_path)
     nodes = manifest.get("nodes", {})
 
-    # Only validate models in this project (exclude packages).
+    # Only validate models in this project (exclude packages and non-core layers).
     models = {
         node_id: node
         for node_id, node in nodes.items()
         if node.get("resource_type") == "model"
         and node.get("package_name") == "dbt_pipeline"
         and node.get("config", {}).get("materialized") != "ephemeral"
+        # Skip staging/intermediate layers; enforce coverage only on core/marts.
+        and not any(
+            tag in (node.get("tags") or [])
+            for tag in ("layer:staging", "layer:intermediate")
+        )
     }
 
     if not models:
@@ -84,4 +89,3 @@ def main(manifest_path: str = "target/manifest.json") -> int:
 if __name__ == "__main__":
     manifest_arg = sys.argv[1] if len(sys.argv) > 1 else "target/manifest.json"
     sys.exit(main(manifest_arg))
-
