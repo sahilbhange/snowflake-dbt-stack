@@ -90,3 +90,49 @@ jobs:
             --dialect snowflake \
             --templater jinja \
             --format github-annotation || true
+
+  dev_tests:
+    name: Dev dbt compile & test (Snowflake dev)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dbt_pipeline
+    env:
+      DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DEV_DATABASE: ${{ secrets.SNOWFLAKE_DEV_DATABASE }}
+      SNOWFLAKE_DEV_SCHEMA: ${{ secrets.SNOWFLAKE_DEV_SCHEMA }}
+      SNOWFLAKE_DEV_ROLE: ${{ secrets.SNOWFLAKE_DEV_ROLE }}
+      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt (Snowflake)
+        run: |
+          pip install \
+            dbt-snowflake
+
+      - name: Write Snowflake private key (dev only)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_B64 }}" | base64 -d > ~/.ssh/dbt_svc_rsa_key.p8
+          chmod 600 ~/.ssh/dbt_svc_rsa_key.p8
+          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$HOME/.ssh/dbt_svc_rsa_key.p8" >> $GITHUB_ENV
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: dbt compile (dev target, Snowflake dev)
+        run: dbt compile --target dev
+
+      - name: dbt test (dev target, Snowflake dev)
+        run: dbt test --target dev
