@@ -21,3 +21,16 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
+
+  - name: mart_revenue_by_service_type
+    description: Daily revenue breakdown by service type for NYC taxi trips.
+    columns:
+      - name: pickup_date
+        tests:
+          - not_null
+      - name: service_type
+        tests:
+          - not_null
+      - name: gross_revenue
+        tests:
+          - not_null
