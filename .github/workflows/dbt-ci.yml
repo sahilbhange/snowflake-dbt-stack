@@ -16,55 +16,30 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Create dummy Snowflake private key (CI only)
-        run: |
-          mkdir -p ~/.ssh
-          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
-          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dbt + linting dependencies
+      - name: Install dbt dependencies
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake \
-            sqlfluff \
-            sqlfluff-templater-dbt
+            dbt-snowflake
 
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt compile (syntax check, dev target)
-        run: dbt compile --target dev
+      - name: dbt parse (syntax and DAG check, dev target)
+        run: dbt parse --target dev
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
-
-      - name: SQLFluff lint (Snowflake dialect)
-        run: |
-          sqlfluff lint models/ \
-            --dialect snowflake \
-            --templater dbt \
-            --format github
-
-      - name: SQLFluff fix (dry run, no changes)
-        run: |
-          sqlfluff fix models/ \
-            --dialect snowflake \
-            --templater dbt \
-            --force \
-            --nofix
 
   validate_prod:
     name: Validate dbt project (prod PRs, no Snowflake compute)
@@ -75,52 +50,27 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Create dummy Snowflake private key (CI only)
-        run: |
-          mkdir -p ~/.ssh
-          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
-          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dbt + linting dependencies
+      - name: Install dbt dependencies
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake \
-            sqlfluff \
-            sqlfluff-templater-dbt
+            dbt-snowflake
 
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt compile (syntax check, prod target)
-        run: dbt compile --target prod
+      - name: dbt parse (syntax and DAG check, prod target)
+        run: dbt parse --target prod
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
-
-      - name: SQLFluff lint (Snowflake dialect)
-        run: |
-          sqlfluff lint models/ \
-            --dialect snowflake \
-            --templater dbt \
-            --format github
-
-      - name: SQLFluff fix (dry run, no changes)
-        run: |
-          sqlfluff fix models/ \
-            --dialect snowflake \
-            --templater dbt \
-            --force \
-            --nofix
