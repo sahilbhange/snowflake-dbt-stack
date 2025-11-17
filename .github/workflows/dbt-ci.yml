@@ -48,7 +48,7 @@ jobs:
           sqlfluff lint models/ \
             --dialect snowflake \
             --templater dbt \
-            --format github
+            --format github-annotation
 
       - name: SQLFluff fix (dry run, no changes)
         run: |
@@ -99,7 +99,7 @@ jobs:
           sqlfluff lint models/ \
             --dialect snowflake \
             --templater dbt \
-            --format github
+            --format github-annotation
 
       - name: SQLFluff fix (dry run, no changes)
         run: |
