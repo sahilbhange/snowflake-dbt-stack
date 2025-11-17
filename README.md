@@ -47,10 +47,23 @@
 
    Alternatively you can stay in the repo root and prefix each command with `dbt --project-dir dbt_pipeline`; just keep the flag on the same line (no stray newlines) so dbt parses the argument correctly.
 
+## CI/CD Overview
+
+This repo includes a GitHub Actions workflow for dbt validation and dev testing:
+
+- **Workflow file:** `.github/workflows/dbt-ci.yml`
+- **Triggers:** Pull requests targeting `dev` or `main`.
+- **Jobs:**
+  - `validate_dev` – `dbt deps` + `dbt parse --target dev` + metadata checks + light SQLFluff on core/marts (no Snowflake compute).
+  - `dev_tests` – `dbt compile --target dev` and `dbt test --target dev` against the Snowflake **DEV** database using secrets.
+  - `validate_prod` – `dbt deps` + `dbt parse --target prod` + metadata checks (no Snowflake compute), runs only after `dev_tests` succeeds on PRs into `main`.
+- **Orchestration:** All real PROD runs (`dbt run`, `dbt build`, `dbt test`) are handled by Snowflake Workspace jobs, not by GitHub.
+
+For a full walkthrough of this CI/CD setup (secrets, job flow, and local equivalents), see `dbt_learning/dbt_cicd_github_actions.md`.
+
 ## Project Layout
 - `scripts/` – raw SQL helpers (initial roles, manual ingest, workflow notes)
 - `dbt_pipeline/` – dbt project: macros, models, snapshots, seeds, packages
 - `plan.md` – living plan for the end-to-end state-of-the-art build
-
 
 
