@@ -16,10 +16,18 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
+      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
+      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create dummy Snowflake private key (CI only)
+        run: |
+          mkdir -p ~/.ssh
+          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
+          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -67,10 +75,18 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
+      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
+      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create dummy Snowflake private key (CI only)
+        run: |
+          mkdir -p ~/.ssh
+          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
+          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
