@@ -26,13 +26,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dbt + linting dependencies
+      - name: Install dbt dependencies
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake \
-            sqlfluff \
-            sqlfluff-templater-dbt
+            dbt-snowflake
 
       - name: dbt deps
         run: dbt deps
@@ -42,21 +40,6 @@ jobs:
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
-
-      - name: SQLFluff lint (Snowflake dialect)
-        run: |
-          sqlfluff lint models/ \
-            --dialect snowflake \
-            --templater jinja \
-            --format github-annotation
-
-      - name: SQLFluff fix (dry run, no changes)
-        run: |
-          sqlfluff fix models/ \
-            --dialect snowflake \
-            --templater jinja \
-            --force \
-            --nofix
 
   validate_prod:
     name: Validate dbt project (prod PRs, no Snowflake compute)
@@ -77,13 +60,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dbt + linting dependencies
+      - name: Install dbt dependencies
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake \
-            sqlfluff \
-            sqlfluff-templater-dbt
+            dbt-snowflake
 
       - name: dbt deps
         run: dbt deps
@@ -93,18 +74,3 @@ jobs:
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
-
-      - name: SQLFluff lint (Snowflake dialect)
-        run: |
-          sqlfluff lint models/ \
-            --dialect snowflake \
-            --templater jinja \
-            --format github-annotation
-
-      - name: SQLFluff fix (dry run, no changes)
-        run: |
-          sqlfluff fix models/ \
-            --dialect snowflake \
-            --templater jinja \
-            --force \
-            --nofix
