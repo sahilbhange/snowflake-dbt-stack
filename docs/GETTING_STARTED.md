@@ -124,6 +124,10 @@ Jobs:
   - `python scripts/validate_dbt_metadata.py`
   - Light, non‑blocking SQLFluff lint on core & marts (no Snowflake connection).
 
+Example GitHub Actions run showing the dev→prod sequence:
+
+![dbt CI/CD workflow run](images/ci-cd-run.png)
+
 This means:
 
 - Every PR must pass `dbt compile`/`dbt test` on Snowflake DEV.
