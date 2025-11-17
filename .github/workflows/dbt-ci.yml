@@ -52,6 +52,7 @@ jobs:
   validate_prod:
     name: Validate dbt project (prod PRs, no Snowflake compute)
     if: github.base_ref == 'main'
+    needs: dev_tests
     runs-on: ubuntu-latest
     defaults:
       run:

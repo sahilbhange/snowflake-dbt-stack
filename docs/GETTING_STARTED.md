@@ -87,7 +87,51 @@ You can also run `dbt docs generate && dbt docs serve` and open the Graph tab fo
 
 In a Snowflake Worksheet workspace, run `dbt deps`, then `dbt run`/`dbt test` with `project_root='/dbt_pipeline'`. Ensure environment vars/connection secrets are configured in the workspace session (same values as above).
 
-## 8. Troubleshooting
+## 8. CI/CD: GitHub Actions + Snowflake Workspace
+
+This project is designed so that:
+
+- **Snowflake Workspace** owns real dbt orchestration (dev/prod runs, schedules, lineage, costs).
+- **GitHub Actions** validates changes on pull requests.
+
+### 8.1 Workflow summary
+
+**File:** `.github/workflows/dbt-ci.yml`
+
+Triggers on:
+
+- `pull_request` to `dev` or `main`.
+
+Jobs:
+
+- `validate_dev` (PRs → `dev`)
+  - Runs in `dbt_pipeline/`.
+  - `dbt deps`
+  - `dbt parse --target dev` (no Snowflake connection).
+  - `python scripts/validate_dbt_metadata.py` to enforce docs/tests on core & marts.
+  - Light, non‑blocking SQLFluff lint on `models/core` and `models/marts` (Snowflake dialect, Jinja templater).
+
+- `dev_tests`
+  - Uses Snowflake **DEV** credentials from GitHub secrets.
+  - `dbt deps`
+  - `dbt compile --target dev`
+  - `dbt test --target dev` (executes tests against the DEV warehouse).
+
+- `validate_prod` (PRs → `main`)
+  - Runs only when `github.base_ref == 'main'` and **after** `dev_tests` (via `needs: dev_tests`).
+  - `dbt deps`
+  - `dbt parse --target prod`
+  - `python scripts/validate_dbt_metadata.py`
+  - Light, non‑blocking SQLFluff lint on core & marts (no Snowflake connection).
+
+This means:
+
+- Every PR must pass `dbt compile`/`dbt test` on Snowflake DEV.
+- For PRs into `main`, prod configuration must also compile, but no PROD runs/tests ever happen from GitHub.
+
+For a more detailed CI/CD reference (including secrets, environment variables, and local equivalents), see `dbt_learning/dbt_cicd_github_actions.md`.
+
+## 9. Troubleshooting
 
 - **Packages missing**: run `dbt deps` inside the environment (workspace or local) before `dbt run`.
 - **Path errors**: set `DBT_PROFILES_DIR` to the absolute path of `dbt_pipeline` from your current working directory.
