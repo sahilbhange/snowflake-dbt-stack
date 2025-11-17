@@ -7,4 +7,4 @@ max_line_length = 120
 # Start with a slightly relaxed rule set to match
 # the existing project style. You can tighten this
 # over time by removing rules from exclude_rules.
-exclude_rules = L009,L010,L014
+exclude_rules = L009,L010,L014,TMP,PRS
