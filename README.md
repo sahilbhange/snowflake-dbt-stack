@@ -50,7 +50,7 @@
 ## Hosted dbt Docs
 
 - Live DEV docs (GitHub Pages):  
-  `https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview`
+  [https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview](https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview)
 
 To regenerate and publish docs:
 
@@ -90,4 +90,3 @@ For a full walkthrough of this CI/CD setup (secrets, job flow, and local equival
 - `scripts/` – raw SQL helpers (initial roles, manual ingest, workflow notes)
 - `dbt_pipeline/` – dbt project: macros, models, snapshots, seeds, packages
 - `plan.md` – living plan for the end-to-end state-of-the-art build
-
