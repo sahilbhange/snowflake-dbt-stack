@@ -1,0 +1,1 @@
+{{ test_unique(column_name="taxi_zone_sk", model=get_where_subquery(ref('dim_taxi_zone'))) }}

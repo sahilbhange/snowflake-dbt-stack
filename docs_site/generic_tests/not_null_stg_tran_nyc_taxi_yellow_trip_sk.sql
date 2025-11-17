@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="trip_sk", model=get_where_subquery(ref('stg_tran_nyc_taxi_yellow'))) }}

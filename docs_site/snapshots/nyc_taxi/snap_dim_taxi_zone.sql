@@ -1,0 +1,1 @@
+{{ snapshot_snap_dim_taxi_zone() }}
