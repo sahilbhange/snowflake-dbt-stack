@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="trip_count", model=get_where_subquery(ref('mart_zone_flow'))) }}

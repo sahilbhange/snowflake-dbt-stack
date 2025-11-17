@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="vendorid", model=get_where_subquery(source('nyc_taxi', 'raw_tran_nyc_taxi_green'))) }}

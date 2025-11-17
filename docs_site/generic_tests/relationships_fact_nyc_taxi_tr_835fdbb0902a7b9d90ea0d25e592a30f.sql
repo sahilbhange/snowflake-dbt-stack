@@ -1,0 +1,1 @@
+{{ test_relationships(column_name="rate_code_sk", field="rate_code_sk", model=get_where_subquery(ref('fact_nyc_taxi_trips')), to=ref('dim_rate_code')) }}

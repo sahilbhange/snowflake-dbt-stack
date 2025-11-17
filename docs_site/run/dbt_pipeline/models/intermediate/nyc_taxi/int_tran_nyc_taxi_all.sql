@@ -1,0 +1,142 @@
+
+  create or replace   view ANALYTICS_DEV.RAW_STAGE.int_tran_nyc_taxi_all
+  
+  
+  
+  
+  as (
+    
+
+with yellow as (
+    select
+        trip_sk,
+        service_type,
+        vendor_id,
+        pickup_timestamp,
+        dropoff_timestamp,
+        pickup_date,
+        pickup_hour,
+        pickup_location_id,
+        dropoff_location_id,
+        passenger_count,
+        trip_distance_miles,
+        trip_duration_minutes,
+        fare_amount,
+        tip_amount,
+        tolls_amount,
+        extra_amount,
+        improvement_surcharge,
+        mta_tax,
+        congestion_surcharge,
+        airport_fee,
+        total_amount,
+        payment_type_code,
+        trip_type_code,
+        rate_code_id,
+        average_speed_mph,
+        was_store_and_forward,
+        null as ehail_fee,
+        null as driver_pay,
+        null as hvfhs_license_num,
+        null as dispatching_base_num,
+        null as originating_base_num,
+        null as shared_request_flag,
+        null as shared_match_flag,
+        null as access_a_ride_flag,
+        null as wav_request_flag,
+        null as wav_match_flag,
+        record_loaded_at
+    from ANALYTICS_DEV.RAW_STAGE.stg_tran_nyc_taxi_yellow
+),
+
+green as (
+    select
+        trip_sk,
+        service_type,
+        vendor_id,
+        pickup_timestamp,
+        dropoff_timestamp,
+        pickup_date,
+        pickup_hour,
+        pickup_location_id,
+        dropoff_location_id,
+        passenger_count,
+        trip_distance_miles,
+        trip_duration_minutes,
+        fare_amount,
+        tip_amount,
+        tolls_amount,
+        extra_amount,
+        improvement_surcharge,
+        mta_tax,
+        congestion_surcharge,
+        airport_fee,
+        total_amount,
+        payment_type_code,
+        trip_type_code,
+        rate_code_id,
+        average_speed_mph,
+        was_store_and_forward,
+        ehail_fee,
+        null as driver_pay,
+        null as hvfhs_license_num,
+        null as dispatching_base_num,
+        null as originating_base_num,
+        null as shared_request_flag,
+        null as shared_match_flag,
+        null as access_a_ride_flag,
+        null as wav_request_flag,
+        null as wav_match_flag,
+        record_loaded_at
+    from ANALYTICS_DEV.RAW_STAGE.stg_tran_nyc_taxi_green
+),
+
+fhvhv as (
+    select
+        trip_sk,
+        service_type,
+        vendor_id,
+        pickup_timestamp,
+        dropoff_timestamp,
+        pickup_date,
+        pickup_hour,
+        pickup_location_id,
+        dropoff_location_id,
+        passenger_count,
+        trip_distance_miles,
+        trip_duration_minutes,
+        fare_amount,
+        tip_amount,
+        tolls_amount,
+        extra_amount,
+        improvement_surcharge,
+        mta_tax,
+        congestion_surcharge,
+        airport_fee,
+        total_amount,
+        payment_type_code,
+        trip_type_code,
+        rate_code_id,
+        average_speed_mph,
+        was_store_and_forward,
+        null as ehail_fee,
+        driver_pay,
+        hvfhs_license_num,
+        dispatching_base_num,
+        originating_base_num,
+        shared_request_flag,
+        shared_match_flag,
+        access_a_ride_flag,
+        wav_request_flag,
+        wav_match_flag,
+        record_loaded_at
+    from ANALYTICS_DEV.RAW_STAGE.stg_tran_nyc_taxi_fhvhv
+)
+
+select * from yellow
+union all
+select * from green
+union all
+select * from fhvhv
+  );
+

@@ -1,0 +1,1 @@
+{{ test_relationships(column_name="payment_type_sk", field="payment_type_sk", model=get_where_subquery(ref('fact_nyc_taxi_trips')), to=ref('dim_payment_type')) }}

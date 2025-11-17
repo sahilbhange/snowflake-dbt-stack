@@ -1,0 +1,1 @@
+{{ test_relationships(column_name="dropoff_zone_sk", field="taxi_zone_sk", model=get_where_subquery(ref('fact_nyc_taxi_trips')), to=ref('dim_taxi_zone')) }}
