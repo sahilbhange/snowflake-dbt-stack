@@ -75,7 +75,7 @@ You can also run `dbt docs generate && dbt docs serve` and open the Graph tab fo
 
 The same docs are also published via GitHub Pages at:
 
-`https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview`
+[https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview](https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview)
 
 To refresh the hosted docs after a code change:
 
