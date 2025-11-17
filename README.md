@@ -5,7 +5,7 @@
 1. Clone repo and enter workspace.
 2. Create and activate the dbt virtualenv: `python -m venv .venv_dbt && source .venv_dbt/bin/activate`.
 3. Install dbt Snowflake locally: `pip install dbt-snowflake`.
-4. Set the profile directory and required Snowflake env vars. The profile now uses environment variables for account, user, role, warehouse, database, schema, and private key, so export them once per shell (consider wrapping them in a script like `scripts/env.sh`). Make sure the private key path points to an existing file; `~` is not expanded inside dbt, so use the absolute path or `realpath` output:
+4. Set the profile directory and required Snowflake env vars. The profile now uses environment variables for account, user, role, warehouse, database, schema, and private key, so export them once per shell (consider wrapping them in a script like `snowflake_scripts/env.sh`). Make sure the private key path points to an existing file; `~` is not expanded inside dbt, so use the absolute path or `realpath` output:
    ```bash
    export DBT_PROFILES_DIR="$(pwd)/dbt_pipeline"
    export SNOWFLAKE_ACCOUNT=JNAEVTS-ZZC51360
@@ -21,13 +21,16 @@
    ```
 5. Run the dbt workflow inside the project dir (note the path contains a space, so wrap it in quotes):
    ```bash
+
    source .venv_dbt/bin/activate
-   export DBT_PROFILES_DIR="$(pwd)/dbt_pipeline"
+   cd dbt_pipeline
+   export DBT_PROFILES_DIR="$(pwd)"
    cd dbt_pipeline
    dbt deps
    dbt seed --select nyc_taxi
    dbt run-operation ingest_nyc_tlc_from_stage
    dbt run --select 'staging.nyc_taxi.stg_tran_nyc_taxi_*'
+  
 
    # build the intermediate union
    dbt run --select intermediate.nyc_taxi.int_tran_nyc_taxi_all
@@ -45,12 +48,15 @@
    dbt docs generate
    ```
 
+   Run multiple DBT steps at Once
+   dbt run --target dev && snapshot --target dev && seed --target dev
+
+
    Alternatively you can stay in the repo root and prefix each command with `dbt --project-dir dbt_pipeline`; just keep the flag on the same line (no stray newlines) so dbt parses the argument correctly.
 
 ## Project Layout
-- `scripts/` – raw SQL helpers (initial roles, manual ingest, workflow notes)
+- `snowflake_scripts/` – raw SQL helpers (initial roles, manual ingest, workflow notes)
 - `dbt_pipeline/` – dbt project: macros, models, snapshots, seeds, packages
 - `plan.md` – living plan for the end-to-end state-of-the-art build
-
 
 

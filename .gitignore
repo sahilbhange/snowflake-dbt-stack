@@ -216,4 +216,16 @@ dbt_packages/
 target/
 logs/
 dbt_modules/
-scripts/
+scripts_bkp/
+
+
+dbt_pipeline_bkp/
+dbt_learning/
+data/
+.venv_dbt/
+.vscode/
+
+README_bkp.md
+.gitignore
+setup/
+plan.md
