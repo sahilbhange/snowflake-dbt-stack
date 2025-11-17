@@ -26,11 +26,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dbt dependencies
+      - name: Install dbt + sqlfluff
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake
+            dbt-snowflake \
+            sqlfluff
 
       - name: dbt deps
         run: dbt deps
@@ -40,6 +41,13 @@ jobs:
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
+
+      - name: SQLFluff lint (core + marts, non-blocking)
+        run: |
+          sqlfluff lint models/core models/marts \
+            --dialect snowflake \
+            --templater jinja \
+            --format github-annotation || true
 
   validate_prod:
     name: Validate dbt project (prod PRs, no Snowflake compute)
@@ -60,11 +68,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dbt dependencies
+      - name: Install dbt + sqlfluff
         run: |
           pip install \
             dbt-core \
-            dbt-snowflake
+            dbt-snowflake \
+            sqlfluff
 
       - name: dbt deps
         run: dbt deps
@@ -74,3 +83,10 @@ jobs:
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
+
+      - name: SQLFluff lint (core + marts, non-blocking)
+        run: |
+          sqlfluff lint models/core models/marts \
+            --dialect snowflake \
+            --templater jinja \
+            --format github-annotation || true
