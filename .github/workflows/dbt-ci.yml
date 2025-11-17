@@ -16,19 +16,10 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Create dummy Snowflake private key (CI only)
-        run: |
-          mkdir -p ~/.ssh
-          # Generate a valid RSA key so dbt-snowflake can parse it,
-          # but it is not used to connect to Snowflake in CI.
-          openssl genrsa -out ~/.ssh/dummy_dbt_key.p8 2048
-          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,8 +37,8 @@ jobs:
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt compile (syntax check, dev target)
-        run: dbt compile --target dev
+      - name: dbt parse (syntax and DAG check, dev target)
+        run: dbt parse --target dev
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
@@ -76,17 +67,10 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Create dummy Snowflake private key (CI only)
-        run: |
-          mkdir -p ~/.ssh
-          openssl genrsa -out ~/.ssh/dummy_dbt_key.p8 2048
-          chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -104,8 +88,8 @@ jobs:
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt compile (syntax check, prod target)
-        run: dbt compile --target prod
+      - name: dbt parse (syntax and DAG check, prod target)
+        run: dbt parse --target prod
 
       - name: Validate docs & tests coverage
         run: python scripts/validate_dbt_metadata.py
