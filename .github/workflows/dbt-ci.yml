@@ -47,14 +47,14 @@ jobs:
         run: |
           sqlfluff lint models/ \
             --dialect snowflake \
-            --templater dbt \
+            --templater jinja \
             --format github-annotation
 
       - name: SQLFluff fix (dry run, no changes)
         run: |
           sqlfluff fix models/ \
             --dialect snowflake \
-            --templater dbt \
+            --templater jinja \
             --force \
             --nofix
 
@@ -98,13 +98,13 @@ jobs:
         run: |
           sqlfluff lint models/ \
             --dialect snowflake \
-            --templater dbt \
+            --templater jinja \
             --format github-annotation
 
       - name: SQLFluff fix (dry run, no changes)
         run: |
           sqlfluff fix models/ \
             --dialect snowflake \
-            --templater dbt \
+            --templater jinja \
             --force \
             --nofix
