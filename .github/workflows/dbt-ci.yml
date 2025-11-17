@@ -16,7 +16,7 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
+      SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
       SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
@@ -75,7 +75,7 @@ jobs:
         working-directory: dbt_pipeline
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ env.HOME }}/.ssh/dummy_dbt_key.p8
+      SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
       SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
