@@ -17,7 +17,6 @@ jobs:
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
       SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
@@ -26,7 +25,9 @@ jobs:
       - name: Create dummy Snowflake private key (CI only)
         run: |
           mkdir -p ~/.ssh
-          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
+          # Generate a valid RSA key so dbt-snowflake can parse it,
+          # but it is not used to connect to Snowflake in CI.
+          openssl genrsa -out ~/.ssh/dummy_dbt_key.p8 2048
           chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
@@ -76,7 +77,6 @@ jobs:
     env:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_pipeline
       SNOWFLAKE_PRIVATE_KEY_PATH: /home/runner/.ssh/dummy_dbt_key.p8
-      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "dummy-passphrase"
 
     steps:
       - name: Checkout
@@ -85,7 +85,7 @@ jobs:
       - name: Create dummy Snowflake private key (CI only)
         run: |
           mkdir -p ~/.ssh
-          echo 'dummy-ci-private-key' > ~/.ssh/dummy_dbt_key.p8
+          openssl genrsa -out ~/.ssh/dummy_dbt_key.p8 2048
           chmod 600 ~/.ssh/dummy_dbt_key.p8
 
       - name: Set up Python
