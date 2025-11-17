@@ -73,6 +73,25 @@ You can also run `dbt docs generate && dbt docs serve` and open the Graph tab fo
 
 ![Lineage Screenshot](images/Lineage.png)
 
+The same docs are also published via GitHub Pages at:
+
+`https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview`
+
+To refresh the hosted docs after a code change:
+
+1. Rebuild docs from `dbt_pipeline/`:
+   ```bash
+   dbt docs generate --target dev
+   ```
+2. From the repo root, sync the static site:
+   ```bash
+   rm -rf docs/dbt_docs/*
+   cp -R dbt_pipeline/target/* docs/dbt_docs/
+   git add docs/dbt_docs
+   git commit -m "Refresh dbt docs (dev)"
+   git push
+   ```
+
 ## 6. Project Layout
 
 - `dbt_pipeline/models/staging/nyc_taxi/` – view models cleaning yellow/green/fhvhv trips.

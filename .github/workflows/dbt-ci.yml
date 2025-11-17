@@ -5,6 +5,11 @@ on:
     branches:
       - "dev"
       - "main"
+    paths-ignore:
+      # Docs-only changes don't need full dbt CI
+      - "docs/**"
+      - "dbt_learning/**"
+      - "README.md"
 
 jobs:
   validate_dev:

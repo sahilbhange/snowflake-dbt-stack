@@ -47,6 +47,31 @@
 
    Alternatively you can stay in the repo root and prefix each command with `dbt --project-dir dbt_pipeline`; just keep the flag on the same line (no stray newlines) so dbt parses the argument correctly.
 
+## Hosted dbt Docs
+
+- Live DEV docs (GitHub Pages):  
+  `https://sahilbhange.github.io/snowflake-dbt-stack/dbt_docs/#!/overview`
+
+To regenerate and publish docs:
+
+1. From `dbt_pipeline/`, run:
+   ```bash
+   dbt docs generate --target dev
+   ```
+2. From the repo root, refresh the static site:
+   ```bash
+   rm -rf docs/dbt_docs/*
+   cp -R dbt_pipeline/target/* docs/dbt_docs/
+   ```
+3. Commit and push:
+   ```bash
+   git add docs/dbt_docs
+   git commit -m "Refresh dbt docs (dev)"
+   git push
+   ```
+
+Docs are served from the `/docs` folder on the `main` branch via GitHub Pages.
+
 ## CI/CD Overview
 
 This repo includes a GitHub Actions workflow for dbt validation and dev testing:
@@ -65,5 +90,4 @@ For a full walkthrough of this CI/CD setup (secrets, job flow, and local equival
 - `scripts/` – raw SQL helpers (initial roles, manual ingest, workflow notes)
 - `dbt_pipeline/` – dbt project: macros, models, snapshots, seeds, packages
 - `plan.md` – living plan for the end-to-end state-of-the-art build
-
 
